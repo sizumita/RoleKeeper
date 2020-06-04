@@ -55,17 +55,16 @@ class Keeper:
 
     async def save_role(self, member):
         roles = list(map(lambda x: x.id, member.roles))
-        my_roles = list(map(lambda x: x.id, member.guild.get_member(self.bot.user.id).roles))
         guild = member.guild
         save_roles = []
         for role in guild.roles:
             if role.id == guild.default_role.id:
                 continue
             if role.name == "Role Keeper":
-                if role.permissions.manage_roles and role in my_roles:
+                if role.permissions.manage_roles:
                     break
-            if role in roles:
-                save_roles.append(str(role))
+            if role.id in roles:
+                save_roles.append(str(role.id))
         guild_document = self.collection.document(f'{guild.id}')
         await self.run(guild_document.set, {str(member.id): save_roles})
 
@@ -74,12 +73,14 @@ class Keeper:
         guild_document = self.collection.document(f'{guild.id}')
         r = await self.run(guild_document.get)
         result = r.to_dict()
+        if result is None or str(member.id) not in result:
+            return
         for role_id in result[str(member.id)]:
             role = guild.get_role(int(role_id))
             if not role:
                 continue
             try:
-                await member.add_role(role)
+                await member.add_roles(role)
             except discord.Forbidden:
                 continue
 
