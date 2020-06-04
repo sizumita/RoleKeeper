@@ -80,6 +80,11 @@ class LangMessage:
                               "コマンドはありません。",
                         inline=False
                         )
+        embed.add_field(name='招待など',
+                        value=f"[Botの招待URL]({bot_invite})\n"
+                              f"[Botの公式サーバー]({guild_invite})",
+                        inline=False
+                        )
         return embed
 
     def help_embed_en(self):
@@ -99,6 +104,11 @@ class LangMessage:
         embed.add_field(name="Commands",
                         value="Displays a list of commands required for the setting.\n"
                               "No commands.",
+                        inline=False
+                        )
+        embed.add_field(name='Invitations',
+                        value=f"[Bot invite]({bot_invite})\n"
+                              f"[Bot's guild]({guild_invite})",
                         inline=False
                         )
         return embed
