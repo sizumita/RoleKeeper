@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord
 import config
 from cogs.utils.keeper import Keeper
@@ -13,9 +13,15 @@ class Bot(commands.Bot):
             except Exception as exc:
                 print('Could not load extension {0} due to {1.__class__.__name__}: {1}'.format(cog, exc))
         self.keeper = Keeper(self)
+        self.activity_task.start()
 
     async def on_ready(self):
         print('Logged on as {0} (ID: {0.id})'.format(self.user))
+
+    @tasks.loop(hours=1)
+    async def activity_task(self):
+        await self.wait_until_ready()
+        await self.change_presence(activity=discord.Game(name=f'help -> khelp : {len(self.guilds)} servers'))
 
     async def on_guild_join(self, guild):
         await self.keeper.greeting(guild)
