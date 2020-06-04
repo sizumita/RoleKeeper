@@ -41,7 +41,7 @@ class Keeper:
         return not_enough
 
     async def send_not_enough_message(self, channel):
-        lang = LangMessage(channel.guild)
+        lang = LangMessage(channel.last_message.guild)
         if self.check_permissions(channel.guild):
             return False
         await channel.send(lang.create_not_enough_message(self.get_not_enough_permissons(channel.guild)))
@@ -55,7 +55,7 @@ class Keeper:
 
     async def save_role(self, member):
         roles = list(map(lambda x: x.id, member.roles))
-        my_roles = list(map(lambda x: x.id, member.guild.me.roles))
+        my_roles = list(map(lambda x: x.id, member.guild.get_member(self.bot.user.id).roles))
         guild = member.guild
         save_roles = []
         for role in guild.roles:

@@ -5,7 +5,7 @@ from cogs.utils.keeper import Keeper
 
 
 class Bot(commands.Bot):
-    def __init__(self, **kwargs):
+    def __init__(self):
         super().__init__(command_prefix=commands.when_mentioned_or('k'), help_command=None)
         for cog in config.cogs:
             try:
@@ -18,7 +18,12 @@ class Bot(commands.Bot):
     async def on_ready(self):
         print('Logged on as {0} (ID: {0.id})'.format(self.user))
 
-    @tasks.loop(hours=1)
+    async def on_command_error(self, context, exception):
+        if isinstance(exception, commands.CommandNotFound):
+            return
+        await super().on_command_error(context, exception)
+
+    @tasks.loop(minutes=10)
     async def activity_task(self):
         await self.wait_until_ready()
         await self.change_presence(activity=discord.Game(name=f'help -> khelp : {len(self.guilds)} servers'))
