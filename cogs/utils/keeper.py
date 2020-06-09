@@ -54,10 +54,13 @@ class Keeper:
         await ctx.send(embed=lang.help_embed)
 
     async def save_role(self, member):
+        ignore_list = await self.get_ignore(member.guild)
         roles = list(map(lambda x: x.id, member.roles))
         guild = member.guild
         save_roles = []
         for role in guild.roles:
+            if role.id in ignore_list:
+                continue
             if role.id == guild.default_role.id:
                 continue
             if role.name == "Role Keeper":
@@ -73,11 +76,14 @@ class Keeper:
         guild_document = self.collection.document(f'{guild.id}')
         r = await self.run(guild_document.get)
         result = r.to_dict()
+        ignore_list = [int(i) for i in result.get('ignore', [])]
         if result is None or str(member.id) not in result:
             return
         for role_id in result[str(member.id)]:
             role = guild.get_role(int(role_id))
             if not role:
+                continue
+            if role.id in ignore_list:
                 continue
             try:
                 await member.add_roles(role)
