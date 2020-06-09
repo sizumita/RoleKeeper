@@ -4,11 +4,17 @@ from cogs.utils.message import LangMessage
 
 
 class Ignore(commands.Cog):
+    async def cog_check(self, ctx):
+        if isinstance(ctx, discord.DMChannel):
+            return False
+        if not ctx.author.guild_permissions.manage_roles:
+            return False
+        return True
+
     def __init__(self, bot):
         self.bot = bot
 
     @commands.group(invoke_without_command=True)
-    @commands.guild_only()
     async def ignore(self, ctx):
         pass
 
