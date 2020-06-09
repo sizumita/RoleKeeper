@@ -84,6 +84,32 @@ class Keeper:
             except discord.Forbidden:
                 continue
 
+    async def add_ignore(self, guild, role):
+        ignore = await self.get_ignore(guild)
+        if role.id in ignore:
+            return False
+        ignore.append(role.id)
+        guild_document = self.collection.document(f'{guild.id}')
+        await self.run(guild_document.set, {'ignore': [str(i) for i in ignore]})
+        return True
+
+    async def remove_ignore(self, guild, role):
+        ignore = await self.get_ignore(guild)
+        if role.id not in ignore:
+            return False
+        ignore.remove(role.id)
+        guild_document = self.collection.document(f'{guild.id}')
+        await self.run(guild_document.set, {'ignore': [str(i) for i in ignore]})
+        return True
+
+    async def get_ignore(self, guild):
+        guild_document = self.collection.document(f'{guild.id}')
+        r = await self.run(guild_document.get)
+        result = r.to_dict()
+        if result is None or 'ignore' not in result:
+            return []
+        return [int(i) for i in result['ignore']]
+
 
 
 
