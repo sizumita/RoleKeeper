@@ -77,7 +77,14 @@ class LangMessage:
                         )
         embed.add_field(name="コマンド一覧",
                         value="設定に必要なコマンド一覧を表示します\n"
-                              "コマンドはありません。",
+                              "`kignore add <役職名 もしくは id もしくは メンション>` 役職を自動付与する際に無視します。\n"
+                              "`kignore remove <役職名 もしくは id もしくは メンション>` 役職を自動付与する際に無視する設定を削除します。\n"
+                              "`kignore list` 無視する役職の一覧を表示します。",
+                        inline=False
+                        )
+        embed.add_field(name='招待など',
+                        value=f"[Botの招待URL]({bot_invite})\n"
+                              f"[Botの公式サーバー]({guild_invite})",
                         inline=False
                         )
         embed.add_field(name='招待など',
@@ -103,7 +110,15 @@ class LangMessage:
                         )
         embed.add_field(name="Commands",
                         value="Displays a list of commands required for the setting.\n"
-                              "No commands.",
+                              "`kignore add <Role name or id or mention>` Ignore this when auto-granting a role.\n"
+                              "`kignore remove <Role name or id or mention>` "
+                              "Removes the setting to ignore when auto-granting a role.\n"
+                              "`kignore list` Displays a list of roles to ignore.",
+                        inline=False
+                        )
+        embed.add_field(name='Invitations',
+                        value=f"[Bot invite]({bot_invite})\n"
+                              f"[Bot's guild]({guild_invite})",
                         inline=False
                         )
         embed.add_field(name='Invitations',
@@ -135,3 +150,26 @@ class LangMessage:
                    "but we couldn't display or operate because we don't have the following permissions:\n{}"
 
         return text.format("\n".join(not_enough))
+
+    @property
+    def success_message(self):
+        if self.lang == 2:
+            return '成功しました。'
+        return 'Success!'
+
+    def add_role_message(self, is_success):
+        if is_success:
+            return self.success_message
+
+        if self.lang == 2:
+            return 'すでに追加されています。'
+        return 'The role has already exists.'
+
+    def remove_role_message(self, is_success):
+        if is_success:
+            return self.success_message
+
+        if self.lang == 2:
+            return '追加されていません。'
+        return 'The role has not exists.'
+

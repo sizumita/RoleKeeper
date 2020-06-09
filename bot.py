@@ -19,7 +19,16 @@ class Bot(commands.Bot):
         print('Logged on as {0} (ID: {0.id})'.format(self.user))
 
     async def on_command_error(self, context, exception):
+        # TODO: 多言語対応
         if isinstance(exception, commands.CommandNotFound):
+            return
+        if isinstance(exception, commands.CheckFailure):
+            await context.send('DMで送信しているか、もしくは役職の管理権限が必要なコマンドを実行している可能性があります。')
+        if isinstance(exception, commands.BadArgument):
+            await context.send('引数の型が間違っています。')
+            return
+        if isinstance(exception, commands.MissingRequiredArgument):
+            await context.send('引数が足りません。')
             return
         await super().on_command_error(context, exception)
 

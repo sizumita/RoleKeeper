@@ -41,7 +41,7 @@ class Keeper:
         return not_enough
 
     async def send_not_enough_message(self, channel):
-        lang = LangMessage(channel.last_message.guild)
+        lang = LangMessage(channel.guild)
         if self.check_permissions(channel.guild):
             return False
         await channel.send(lang.create_not_enough_message(self.get_not_enough_permissons(channel.guild)))
@@ -54,10 +54,13 @@ class Keeper:
         await ctx.send(embed=lang.help_embed)
 
     async def save_role(self, member):
+        ignore_list = await self.get_ignore(member.guild)
         roles = list(map(lambda x: x.id, member.roles))
         guild = member.guild
         save_roles = []
         for role in guild.roles:
+            if role.id in ignore_list:
+                continue
             if role.id == guild.default_role.id:
                 continue
             if role.name == "Role Keeper":
@@ -73,16 +76,45 @@ class Keeper:
         guild_document = self.collection.document(f'{guild.id}')
         r = await self.run(guild_document.get)
         result = r.to_dict()
+        ignore_list = [int(i) for i in result.get('ignore', [])]
         if result is None or str(member.id) not in result:
             return
         for role_id in result[str(member.id)]:
             role = guild.get_role(int(role_id))
             if not role:
                 continue
+            if role.id in ignore_list:
+                continue
             try:
                 await member.add_roles(role)
             except discord.Forbidden:
                 continue
+
+    async def add_ignore(self, guild, role):
+        ignore = await self.get_ignore(guild)
+        if role.id in ignore:
+            return False
+        ignore.append(role.id)
+        guild_document = self.collection.document(f'{guild.id}')
+        await self.run(guild_document.set, {'ignore': [str(i) for i in ignore]})
+        return True
+
+    async def remove_ignore(self, guild, role):
+        ignore = await self.get_ignore(guild)
+        if role.id not in ignore:
+            return False
+        ignore.remove(role.id)
+        guild_document = self.collection.document(f'{guild.id}')
+        await self.run(guild_document.set, {'ignore': [str(i) for i in ignore]})
+        return True
+
+    async def get_ignore(self, guild):
+        guild_document = self.collection.document(f'{guild.id}')
+        r = await self.run(guild_document.get)
+        result = r.to_dict()
+        if result is None or 'ignore' not in result:
+            return []
+        return [int(i) for i in result['ignore']]
 
 
 
