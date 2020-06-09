@@ -21,6 +21,12 @@ class Bot(commands.Bot):
     async def on_command_error(self, context, exception):
         if isinstance(exception, commands.CommandNotFound):
             return
+        if isinstance(exception, commands.BadArgument):
+            await context.send('引数の型が間違っています。')
+            return
+        if isinstance(exception, commands.MissingRequiredArgument):
+            await context.send('引数が足りません。')
+            return
         await super().on_command_error(context, exception)
 
     @tasks.loop(minutes=10)
