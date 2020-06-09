@@ -41,7 +41,7 @@ class Keeper:
         return not_enough
 
     async def send_not_enough_message(self, channel):
-        lang = LangMessage(channel.last_message.guild)
+        lang = LangMessage(channel.guild)
         if self.check_permissions(channel.guild):
             return False
         await channel.send(lang.create_not_enough_message(self.get_not_enough_permissons(channel.guild)))
