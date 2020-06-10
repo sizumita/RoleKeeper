@@ -87,11 +87,6 @@ class LangMessage:
                               f"[Botの公式サーバー]({guild_invite})",
                         inline=False
                         )
-        embed.add_field(name='招待など',
-                        value=f"[Botの招待URL]({bot_invite})\n"
-                              f"[Botの公式サーバー]({guild_invite})",
-                        inline=False
-                        )
         return embed
 
     def help_embed_en(self):
@@ -114,11 +109,6 @@ class LangMessage:
                               "`kignore remove <Role name or id or mention>` "
                               "Removes the setting to ignore when auto-granting a role.\n"
                               "`kignore list` Displays a list of roles to ignore.",
-                        inline=False
-                        )
-        embed.add_field(name='Invitations',
-                        value=f"[Bot invite]({bot_invite})\n"
-                              f"[Bot's guild]({guild_invite})",
                         inline=False
                         )
         embed.add_field(name='Invitations',
