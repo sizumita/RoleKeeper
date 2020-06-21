@@ -69,6 +69,8 @@ class Keeper:
             if role.id in roles:
                 save_roles.append(str(role.id))
         guild_document = self.collection.document(f'{guild.id}')
+        if member.nick:
+            save_roles.append("N" + member.nick)
         await self.run(guild_document.set, {str(member.id): save_roles})
 
     async def load_role(self, member):
@@ -80,6 +82,12 @@ class Keeper:
         if result is None or str(member.id) not in result:
             return
         for role_id in result[str(member.id)]:
+            try:
+                int(role_id)
+            except ValueError:
+                if member.guild.me.guild_permissions.manage_nicknames:
+                    await member.edit(nick=role_id[1:])
+                continue
             role = guild.get_role(int(role_id))
             if not role:
                 continue
