@@ -108,51 +108,6 @@ class Admin(commands.Cog):
         except commands.ExtensionNotLoaded:
             self.bot.load_extension(module)
 
-    @_reload.command(name='all', hidden=True)
-    async def _reload_all(self, ctx):
-        """Reloads all modules, while pulling from git."""
-
-        async with ctx.typing():
-            stdout, stderr = await self.run_process('git pull')
-
-        # progress and stuff is redirected to stderr in git pull
-        # however, things like "fast forward" and files
-        # along with the text "already up-to-date" are in stdout
-
-        if stdout.startswith('Already up-to-date.'):
-            return await ctx.send(stdout)
-
-        modules = self.find_modules_from_git(stdout)
-        mods_text = '\n'.join(f'{index}. `{module}`' for index, (_, module) in enumerate(modules, start=1))
-        prompt_text = f'This will update the following modules, are you sure?\n{mods_text}'
-        confirm = await ctx.prompt(prompt_text, reacquire=False)
-        if not confirm:
-            return await ctx.send('Aborting.')
-
-        statuses = []
-        for is_submodule, module in modules:
-            if is_submodule:
-                try:
-                    actual_module = sys.modules[module]
-                except KeyError:
-                    statuses.append((ctx.tick(None), module))
-                else:
-                    try:
-                        importlib.reload(actual_module)
-                    except Exception as e:
-                        statuses.append((ctx.tick(False), module))
-                    else:
-                        statuses.append((ctx.tick(True), module))
-            else:
-                try:
-                    self.reload_or_load_extension(module)
-                except commands.ExtensionError:
-                    statuses.append((ctx.tick(False), module))
-                else:
-                    statuses.append((ctx.tick(True), module))
-
-        await ctx.send('\n'.join(f'{status}: `{module}`' for status, module in statuses))
-
     @commands.command(pass_context=True, hidden=True, name='eval')
     async def _eval(self, ctx, *, body: str):
         """Evaluates a code"""
