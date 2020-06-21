@@ -78,9 +78,9 @@ class Keeper:
         guild_document = self.collection.document(f'{guild.id}')
         r = await self.run(guild_document.get)
         result = r.to_dict()
-        ignore_list = [int(i) for i in result.get('ignore', [])]
         if result is None or str(member.id) not in result:
             return
+        ignore_list = [int(i) for i in result.get('ignore', [])]
         for role_id in result[str(member.id)]:
             try:
                 int(role_id)
@@ -122,7 +122,7 @@ class Keeper:
         result = r.to_dict()
         if result is None or 'ignore' not in result:
             return []
-        return [int(i) for i in result['ignore']]
+        return [int(i) for i in result.get('ignore', [])]
 
 
 
