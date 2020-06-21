@@ -1,7 +1,7 @@
 from discord import VoiceRegion, Embed
 from config import version
 bot_invite = "https://discord.com/api/oauth2/authorize?client_id=717731069977165905&permissions=268438656&scope=bot"
-guild_invite = "https://discord.gg/ZDn4GVj"
+guild_invite = "https://discord.gg/HC5mUs9"
 color = 0x00bfff
 
 
